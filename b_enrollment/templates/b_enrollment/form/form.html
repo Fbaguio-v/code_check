@@ -1,0 +1,54 @@
+{% load static tailwind_tags %}
+{% tailwind_css %}
+<div class="flex items-center justify-center h-full w-full">
+	<div class="flex flex-col items-center justify-center border border-solid border-gray-300 h-[500px] w-[500px] gap-6">
+		<h1 class="text-4xl">Join a Class</h1>
+		<div class="flex flex-col items-center justify-center gap-6 h-full w-full">
+			<label for="id_subject_id">Class Code</label>
+			<input id="id_subject_id" type="text" placeholder="Input Class Code..." class="w-[50%] border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300">
+			<button type="submit" id="join-class" onclick="joinClass()" class="w-[25%] h-[50px] border border-solid border-gray-300 cursor-pointer bg-blue-500 hover:bg-blue-700 hover:text-white">Join Class</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	async function joinClass() {
+		let subject_id = document.getElementById("id_subject_id");
+		alert(`You inputted ${subject_id.value}`);
+		const response = await fetch("/e/", {
+			method : "POST",
+			headers : {
+				"Content-Type" : "application/json",
+				"X-CSRFToken" : getCookie("csrftoken")
+			},
+			body : JSON.stringify({
+				"subject_id" : subject_id.value
+			})
+		});
+
+		if(response.ok) {
+			const data = await response.json()
+			subject_id.value = "";
+
+			if (data.redirect_url) {
+		        window.location.href = data.redirect_url;
+		    }
+		}
+	}
+
+	function getCookie(name) {
+	    let cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        const cookies = document.cookie.split(';');
+	        for (let i = 0; i < cookies.length; i++) {
+	            const cookie = cookies[i].trim();
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+</script>

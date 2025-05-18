@@ -1,0 +1,35 @@
+{% load static tailwind_tags %}
+{% tailwind_css %}
+<div class="flex flex-col items-center justify-center h-full w-full">
+	{% if user %}
+
+	    <div>
+	    	<h1 class="text-3x1">Edit Account</h1>
+	    </div>
+		<form action="{% url 'a_classroom:edit-account' %}" method="post" class="flex flex-col h-[75%] w-full items-center justify-center gap-2">
+		    {% csrf_token %}
+
+		    <div class="flex flex-col gap-2 items-center justify-center">
+		        <label for="username" class="text-2xl">Username</label>
+		        <input type="text" name="username" id="username" class="text-1xl border border-solid border-gray-300" value="{{ user.username }}" required>
+		    </div>
+
+		    <div class="flex flex-col gap-2 items-center justify-center">
+		        <label for="first_name" class="text-2xl">First Name</label>
+		        <input type="text" name="first_name" id="first_name" class="text-1xl border border-solid border-gray-300" value="{{ user.first_name }}" required>
+		    </div>
+
+		    <div class="flex flex-col gap-2 items-center justify-center">
+		        <label for="last_name" class="text-2xl">Last Name</label>
+		        <input type="text" name="last_name" id="last_name" class="text-1xl border border-solid border-gray-300" value="{{ user.last_name }}" required>
+		    </div>
+
+			<div class="flex flex-col gap-2 items-center justify-center">
+		        <label for="password" class="text-2xl">Password</label>
+		        <input type="password" name="password" id="password" class="text-1xl border border-solid border-gray-300">
+		    </div>
+
+		    <button type="submit" class="border border-solid border-gray-300 cursor-pointer bg-blue-300 hover:bg-blue-600 hover:text-white h-[45px] w-[30%]">Save Changes</button>
+		</form>
+	{% endif %}
+</div>

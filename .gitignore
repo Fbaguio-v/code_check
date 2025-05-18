@@ -1,0 +1,6 @@
+*.sqlite3
+db.sqlite3
+*.log
+media/
+productionfiles/
+node_modules/

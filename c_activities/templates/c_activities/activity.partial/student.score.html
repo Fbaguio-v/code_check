@@ -1,0 +1,18 @@
+<form class="flex flex-row items-center justify-center h-full w-full"
+	id="score-form"
+	hx-post="{% url 'c_activities:grade-a-student' %}"
+	hx-trigger="submit"
+	hx-swap="outerHTML">
+	{% csrf_token %}
+	<input name="submission-id" value="{{ submission_id }}" hidden>
+        <input name="score"
+           class="border border-solid border-gray-300"
+           placeholder="Enter score"
+           {% if score %}
+               value="{{ score }}"
+           {% endif %}>
+    <button type="submit"
+            class="border border-solid border-gray-300 bg-blue-300 hover:bg-blue-700 hover:text-white">
+        Confirm
+    </button>
+</form>

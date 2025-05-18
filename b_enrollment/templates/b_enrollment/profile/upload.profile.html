@@ -1,0 +1,17 @@
+<div class="flex items-center justify-center h-full w-full">
+    <form method="post" action="{% url 'b_enrollment:upload-profile' %}" enctype="multipart/form-data" class="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label for="{{ form.image.id_for_label }}" class="block text-gray-700 font-bold mb-2">Upload Profile Photo:</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.image.errors }}</p>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+            Upload
+        </button>
+    </form>	
+</div>

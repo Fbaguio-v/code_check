@@ -1,0 +1,109 @@
+{% load static tailwind_tags %}
+{% tailwind_css %}
+
+<!-- CREATE A MESSAGE SO THAT THE USER WILL KNOW IF THE ACTIVITY CREATION IS A SUCCESS OR NOT -->
+
+<div class="flex flex-col items-center justify-center h-screen w-full py-10">
+    <h1 class="text-4xl mb-6">Create Activity</h1>
+    <input id="subject_id" hidden value="{{ subject_id }}">
+
+    <div class="w-full max-w-xl border border-gray-300 p-6 rounded-lg shadow-sm">
+        <div class="flex flex-col space-y-4">
+            <div>
+                <label for="id_title" class="block font-semibold">Title</label>
+                <input id="id_title" type="text" placeholder="Activity Title" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+
+            <div>
+                <label for="id_description" class="block font-semibold">Description</label>
+                <input id="id_description" type="text" placeholder="Activity Description" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+
+            <div>
+                <label for="id_max_score" class="block font-semibold">Max Score</label>
+                <input id="id_max_score" type="number" placeholder="Maximum Score" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+
+            <div>
+                <label for="id_due_at" class="block font-semibold">Due</label>
+                <input id="id_due_at" type="datetime-local" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300" required>
+            </div>
+
+            <button onclick="createActivity()" type="submit" id="create_button" class="mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition cursor-pointer">
+                Create Activity
+            </button>
+        </div>
+
+        <div class="mt-8">
+            <h5 class="text-lg font-semibold mb-2">Activity Evaluation Criteria</h5>
+            <table class="w-full table-fixed border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border px-2 py-1">Correctness</th>
+                        <th class="border px-2 py-1">Syntax</th>
+                        <th class="border px-2 py-1">Structure</th>
+                        <th class="border px-2 py-1">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border px-2 py-1"></td>
+                        <td class="border px-2 py-1"></td>
+                        <td class="border px-2 py-1"></td>
+                        <td class="border px-2 py-1"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+	async function createActivity() {
+		let subject_id = document.getElementById("subject_id");
+		let id_title = document.getElementById("id_title");
+		let id_description = document.getElementById("id_description");
+		let id_max_score = document.getElementById("id_max_score");
+		let id_due_at = document.getElementById("id_due_at");
+		const response = await fetch("/a/", {
+			method : "POST",
+			headers : {
+				"Content-Type" : "application/json",
+				"X-CSRFToken" : getCookie("csrftoken")
+			},
+			body : JSON.stringify({
+				"subject_id" : subject_id.value,
+				"title" : id_title.value,
+				"description" : id_description.value,
+				"max_score" : id_max_score.value,
+				"due_at" : id_due_at.value
+			})
+		});
+
+		if(response.ok) {
+			const data = await response.json()
+			subject_id.value = "";
+			id_title.value = "";
+			id_description.value = "";
+			id_max_score.value = "";
+			id_due_at.value = "";
+		}
+
+	}
+
+	function getCookie(name) {
+	    let cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        const cookies = document.cookie.split(';');
+	        for (let i = 0; i < cookies.length; i++) {
+	            const cookie = cookies[i].trim();
+	            // Does this cookie string begin with the name we want?
+	            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	        }
+	    }
+	    return cookieValue;
+	}
+</script>

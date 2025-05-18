@@ -1,0 +1,124 @@
+{% extends 'a_classroom/base.html' %}
+{% block title %} student compiler html {% endblock %}
+{% block content %}
+	<div id="parent" class="border border-solid border-gray-300 h-full w-full flex flex-row">
+		<div class="flex items-center justify-center h-full w-[700px]">
+			<div class="flex flex-col items-center justify-center border border-solid h-[90%] w-[90%]">
+				<h1>{{ activity.title }}</h1>
+				<p>{{ activity.description }}</p>
+				<p>{{ activity.max_score }}</p>
+				<p>{{ activity.due_at }}</p>
+			</div>
+		</div> 
+		<input id="subject-id" value="{{ subject_id }}" type="hidden">
+		<input id="activity-id" value="{{ activity.activity_id }}" type="hidden">
+		<div class="flex flex-col h-full w-full">
+			<div class="h-[500px] w-full flex flex-row overflow-hidden">
+				<div class="border-r border-gray-300 w-auto overflow-hidden">
+					<pre id="div-number" class="h-full overflow-y-scroll text-right pr-2 pt-1 text-sm font-mono leading-5 text-gray-600"></pre>
+				</div>
+				<textarea id="compiler" class="h-full w-full resize-none overflow-y-scroll border outline-none font-mono text-sm p-2 leading-5" style="resize: none;"></textarea>
+			</div>
+			<div class="border border-solid flex flex-row h-[150px] w-full">
+				<div class="flex flex-col w-full items-center justify-center gap-4">
+					<form id="turn-in" class="h-[45px] w-[25%]">
+						<button class="border border-solid border-gray-300 bg-blue-300 h-full w-full cursor-pointer hover:bg-blue-700 hover:text-white">Turn In</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const compiler = document.getElementById("compiler");
+			const div = document.getElementById("div-number");
+
+			const updateLineNumbers = () => {
+				const lines = compiler.value.split("\n").length;
+				let lineNumbers = "";
+				for (let i = 1; i <= lines; i++) {
+					lineNumbers += `${i}\n`;
+				}
+				div.textContent = lineNumbers;
+			};
+
+			updateLineNumbers();
+
+			compiler.addEventListener("input", updateLineNumbers);
+
+			compiler.addEventListener("scroll", () => {
+				div.scrollTop = compiler.scrollTop;
+			});
+
+			compiler.addEventListener("keydown", (e) => {
+				if (e.key === "Tab") {
+					e.preventDefault();
+
+					const start = compiler.selectionStart;
+					const end = compiler.selectionEnd;
+					const indent = "    ";
+
+					compiler.value =
+						compiler.value.substring(0, start) + indent + compiler.value.substring(end);
+
+					// Move the cursor after the inserted indent
+					compiler.selectionStart = compiler.selectionEnd = start + indent.length;
+
+					updateLineNumbers();
+				}
+			});
+
+			let turninForm = document.getElementById("turn-in");
+
+			turninForm.addEventListener("submit", (e) => {
+				e.preventDefault();
+				let subject_id = document.getElementById("subject-id");
+				let activity_id = document.getElementById("activity-id");
+				let textarea = document.getElementById("compiler");
+				if(subject_id && activity_id && textarea.value.trim() !== "") {
+					turnInFunction(subject_id.value, activity_id.value, textarea.value);
+				}
+			});
+
+			async function turnInFunction(subject_id, activity_id, textarea_value) {
+				const response = await fetch("/a/t/", {
+					method : "POST",
+					headers : {
+						"Content-Type" : "application/json",
+						"X-CSRFToken" : getCookie("csrftoken")
+					},
+					body : JSON.stringify({
+						"subject_id" : subject_id,
+						"activity_id" : activity_id,
+						"code" : textarea_value
+					})
+				});
+
+				if (!response.ok) {
+					const errorText = await response.text();
+					console.error("Server error:", errorText);
+					throw new Error("Submission failed");
+				}
+
+				const data = await response.json();
+				console.log(data)
+			}
+
+			function getCookie(name) {
+			    let cookieValue = null;
+			    if (document.cookie && document.cookie !== '') {
+			        const cookies = document.cookie.split(';');
+			        for (let i = 0; i < cookies.length; i++) {
+			            const cookie = cookies[i].trim();
+			            // Does this cookie string begin with the name we want?
+			            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+			                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+			                break;
+			            }
+			        }
+			    }
+			    return cookieValue;
+			}
+		});
+	</script>
+{% endblock %}

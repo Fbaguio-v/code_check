@@ -1,0 +1,52 @@
+<div class="h-screen w-full">
+	<table class="table-fixed w-full border border-solid border-gray-300">
+		<thead class="bg-gray-800 text-white h-[60px] border border-solid border-gray-300">
+			<tr class="text-left">
+				<th class="px-4 py-2">Student Profile</th>
+				<th class="px-4 py-2">Student Email</th>
+				<th class="px-4 py-2">Submitted Date</th>
+				<th class="px-4 py-2">Submitted Code</th>
+				<th class="px-4 py-2">Score</th>
+			</tr>
+		</thead>
+		<tbody class="w-full">
+			{% for submission in submissions %}
+				<tr class="h-[50px] border border-solid border-gray-300">
+					<td class="overflow-hidden"><img src="{% if submission.student.userprofile.image %}{{ submission.student.userprofile.image.url }}{% else %}/media/mysite_images/default.jpg{% endif %}"
+                    alt="Profile Image"
+                    class="flex rounded-circle shadow-lg h-[50px] w-[50px] object-cover border-2 border-solid border-blue-500 rounded-full m-2"></td>
+					<td class="px-4 py-2">{{ submission.student.email }}</td>
+					<td class="px-4 py-2">{{ submission.submitted_at }}</td>
+					<td class="px-4 py-2">{{ submission.submitted_code }}</td>
+					{% if not submission.score %}
+						<td id="td-target" class="px-4 py-2">
+							<button
+							id="grade"
+							hx-get="{% url 'c_activities:grade-a-student' %}?submission_id={{ submission.id }}"
+							hx-trigger="click"
+							hx-target="#td-target"
+							hx-swap="innerHTML"
+							class="cursor-pointer w-[50%] h-[75%] bg-blue-300 hover:bg-blue-700 hover:text-white">Grade</button>
+						</td>
+					{% else %}
+						<td id="td-target-{{ submission.id }}" class="px-4 py-2" title="Double-click to edit score">
+							<span
+								id="replace-grade-{{ submission.id }}"
+								hx-get="{% url 'c_activities:grade-a-student' %}?submission_id={{ submission.id }}"
+								hx-trigger="dblclick"
+								hx-target="#td-target-{{ submission.id }}"
+								hx-swap="innerHTML"
+								style="display: block; cursor: pointer;">
+								{{ submission.score }}
+							</span>
+						</td>
+					{% endif %}
+				</tr>
+			{% empty %}
+				<tr>
+					<td colspan="4" class="text-center py-4">No one submitted yet.</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>

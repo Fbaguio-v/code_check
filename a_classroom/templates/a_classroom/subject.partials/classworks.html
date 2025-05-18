@@ -1,0 +1,34 @@
+{% load static tailwind_tags %}
+{% tailwind_css %}
+    <div id="parent-element" class="flex justify-center h-screen">
+        <div class="col-span-2 p-6 space-x-6 border-t border-b border-gray-300 border-solid ">
+
+             {% if activities|length > 1 %}
+                <div>
+                    <h1 class="text-2xl font-semibold">Classworks</h1>
+                </div>
+            {% else %}
+                <div>
+                    <h1 class="text-2xl font-semibold">Classwork</h1>
+                </div>
+            {% endif %}
+
+            {% if activities %}
+                <div>
+                    {% if request.user.is_authenticated %}
+                        {% for activity in activities %}
+                            <a href="{% url 'a_classroom:view-activity' activity.activity_id %}">
+                                <div class="flex items-center justify-start text-left h-20 w-[800px] border-t border-solid rounded-md border-gray-300 shadow-md overflow-hidden leading-none px-4">
+                                    <h1>{{ activity.title }} - {{ activity.description }}</h1>
+                                </div>  
+                            </a>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% else %}
+                <h1>No Activities Available</h1>
+            {% endif %}
+        </div>
+    </div>
+
+   
