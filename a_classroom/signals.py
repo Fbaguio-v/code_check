@@ -22,21 +22,25 @@ def create_user_profile(sender, instance, created, **kwargs):
 
         UserProfile.objects.create(user=instance, role=role)
 
+        if role == Role.ADMIN:
+            instance.is_active = True
+            instance.save(update_fields=["is_active"])
+        else:
+            instance.is_active = False
+            instance.save(update_fields=["is_active"])
 
-        instance.is_active = False
-        instance.save(update_fields=["is_active"])
+            try:
+                subject = "Account Pending Activation - CodeCheckAI"
+                message = (
+                    f"Hello {instance.first_name},\n\n"
+                    "Thank you for signing up for CodeCheckAI.\n\n"
+                    "Your account is currently inactive. Please wait for the admin to review and activate your account.\n\n"
+                    "You will receive another email once your account is approved.\n\n"
+                    "If you have any questions, feel free to contact support.\n\n"
+                    "Best regards,\nCodeCheckAI Team"
+                )
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [instance.email])
+                print("✅ Email verification sent successfully!")
+            except Exception as e:
+                print(f"❌ Error sending verification email: {e}")
 
-        try:
-            subject = "Account Pending Activation - CodeCheckAI"
-            message = (
-                f"Hello {instance.first_name},\n\n"
-                "Thank you for signing up for CodeCheckAI.\n\n"
-                "Your account is currently inactive. Please wait for the admin to review and activate your account.\n\n"
-                "You will receive another email once your account is approved.\n\n"
-                "If you have any questions, feel free to contact support.\n\n"
-                "Best regards,\nCodeCheckAI Team"
-            )
-            send_mail(subject, message, settings.EMAIL_HOST_USER, [instance.email])
-            print("✅ Email verification sent successfully!")
-        except Exception as e:
-            print(f"❌ Error sending verification email: {e}")
