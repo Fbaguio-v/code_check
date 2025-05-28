@@ -8,7 +8,9 @@ urlpatterns = [
     path("subject/<str:subject_id>/", views.view_subject, name="v"),
     #
     path("create/subject/", views.CreateSubjectView.as_view(), name="create-subject"),
-    #
+    # Below this comment
+    path("about/", views.about, name="about"),
+    # Above this comment
     path("approve/<int:user_id>/", views.ApproveUserAdminView.as_view(), name="approve"),
     path("activity/<str:activity_id>/", views.ActivityView.as_view(), name="view-activity"),
     path("settings/", views.user_settings, name="setting"),
