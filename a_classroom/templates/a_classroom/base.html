@@ -30,16 +30,21 @@
         <nav class="flex flex-row items-center justify-between h-[75px] col-span-2 p-6 space-x-6 text-white bg-gray-800 shadow-xl ">
             <ul class="flex flex-row items-center space-x-12">
                 <li><a href="{% url 'a_classroom:index' %}"><img class="h-10" src="/media/mysite_images/logo.png" alt="logo.png"></a></li>
+                <!-- Below this comment -->
                 {% if request.user.is_authenticated %}
-                <li><a href="{% url 'a_classroom:index' %}"
-                    class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Home</a></li>
-                    {% if request.user.is_authenticated and request.user.userprofile.role == "Admin" %}
-                        <li><a href="/admin"
-                            class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Admin</a></li>
-                    {% endif %}
-                <li><a href="{% url 'd_compiler:index' %}"
-                    class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Playground</a></li>
+                    <li><a href="{% url 'a_classroom:index' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Home</a></li>
+                        {% if request.user.userprofile.role == "Admin" %}
+                            <li><a href="/admin"
+                                class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Admin</a></li>
+                        {% elif request.user.userprofile.role == "Student" %}
+                            <li><a href="{% url 'd_compiler:index' %}"
+                                class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Playground</a></li>
+                        {% endif %}
+                    <li><a href="{% url 'a_classroom:about' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">About</a></li>
                 {% endif %}
+                <!-- Above this comment -->
             </ul>
             <ul class="flex space-x-12">
                 {% if request.user.is_authenticated %}
