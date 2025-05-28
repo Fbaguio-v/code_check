@@ -86,6 +86,11 @@ def user_settings(request):
     email = request.user.email
     return render(request, 'a_classroom/setting.html', {"user_profile" : user_profile, "email" : email})
 
+# Below this comment
+def about(request):
+    return render(request, 'a_classroom/about.html')
+# Above this comment
+
 @never_cache
 def view_subject(request, subject_id):
     subject = get_object_or_404(Subject, subject_id = subject_id)
