@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.http import HttpResponse
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
 # Create your views here.
 def index(request):
     if not hasattr(request.user, 'userprofile'):
