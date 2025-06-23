@@ -25,26 +25,40 @@
         {% endfor %}
     </div>
     {% endif %}   
-
-    <div class="grid grid-cols-[200px_1fr] grid-rows-[auto_1fr] min-h-screen max-h-screen font-normal">
+    <!-- Below this comment -->
+    <div class="
+    grid grid-rows-[auto_1fr] min-h-screen max-h-screen font-normal
+    {% if request.user.is_authenticated %}
+        grid-cols-[200px_1fr]
+    {% else %}
+        grid-cols-1
+    {% endif %}">
         <nav class="flex flex-row items-center justify-between h-[75px] col-span-2 p-6 space-x-6 text-white bg-gray-800 shadow-xl ">
             <ul class="flex flex-row items-center space-x-12">
                 <li><a href="{% url 'a_classroom:index' %}"><img class="h-10" src="/media/mysite_images/logo.png" alt="logo.png"></a></li>
                 {% if request.user.is_authenticated %}
-                <li><a href="{% url 'a_classroom:index' %}"
-                    class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Home</a></li>
-                    {% if request.user.is_authenticated and request.user.userprofile.role == "Admin" %}
-                        <li><a href="/admin"
-                            class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Admin</a></li>
-                    {% endif %}
-                <li><a href="{% url 'd_compiler:index' %}"
-                    class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Playground</a></li>
+                    <li><a href="{% url 'a_classroom:index' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Home</a></li>
+                        {% if request.user.userprofile.role == "Student" %}
+                            <li><a href="{% url 'd_compiler:index' %}"
+                                class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Playground</a></li>
+                        {% endif %}
+                    <li><a href="{% url 'a_classroom:about' %}?from={{ request.path }}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">About</a></li>
+                {% else %}
+                    <li><a href="{% url 'd_compiler:index' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white">Playground</a></li>
                 {% endif %}
             </ul>
             <ul class="flex space-x-12">
                 {% if request.user.is_authenticated %}
                     <li><a href="{% url 'a_classroom:setting' %}?from={{ request.path }}"
                         class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white ">Settings</a></li>
+                {% else %}
+                    <li><a href="{% url 'register:register' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white ">Register</a></li>
+                    <li><a href="{% url 'register:login' %}"
+                        class="p-4 transition duration-300 ease-in-out delay-150 transform rounded-lg hover:-translate-y-1 hover:scale-100 hover:bg-gray-500 hover:shadow-lg hover:text-white ">Login</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -62,8 +76,6 @@
         {% if request.user.is_authenticated %}
             <aside id="sidebar" class="flex flex-col justify-between p-4 text-white bg-gray-100 border-2 shadow-xl">
             </aside>
-        {% else %}
-            <aside class="p-4 text-white"></aside>
         {% endif %}
      
         <main id="main-content" class="p-8 overflow-auto">
@@ -71,6 +83,7 @@
             {% endblock %}
         </main>
     </div>
+    <!-- Above this comment -->
     <script src="{% static 'js/myjs.js' %}"></script>
 </body>
 </html>

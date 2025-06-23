@@ -4,7 +4,7 @@
 {% tailwind_css %}
 {% block content %}
 
-<div class="flex items-center justify-center min-h-screen bg-white min-w-80">
+<div class="flex items-center justify-center h-full w-full bg-white min-w-80">
     <div class="flex items-center justify-center w-full max-w-xl p-8 bg-white border border-gray-300 shadow-xl rounded-xl">
         <form action="{% url 'register:login' %}?next={{ request.path }}" method="post" class="flex flex-col items-center w-full max-w-md gap-6">
             {% csrf_token %}

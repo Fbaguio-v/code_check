@@ -9,12 +9,19 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.contrib import messages
 from django.conf import settings
 from django.utils import timezone
-from transformers import pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from openai import OpenAI
+import torch
 import requests
 import json
 
 # Create your views here.
-pipe = pipeline("text-generation", model="Salesforce/codegen-350M-multi")
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-350M-multi").to(device)
+tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-350M-multi")
+pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0 if torch.cuda.is_available() else -1)
 
 def prompt_to_code(prompt, activity):
     outputs = pipe(prompt, max_length=100, num_return_sequences=5, do_sample=True, top_k=50, truncation=True)
@@ -26,11 +33,39 @@ def prompt_to_code(prompt, activity):
             example_text=output['generated_text']
         )
         saved_examples.append(example.example_text)
-    for example in saved_examples:
-    	print(example)
-
+    
     return saved_examples
 
+def evaluate_student_code(instruction, code, examples):
+    prompt = f"""
+    Evaluate the following code based on.
+    - *Instruction* : {instruction}
+    - *Syntax* : Are there any syntax errors or formatting issues?
+    - *Correctness* : Does the code logically perform the intended task?
+    - *Structure* : Is the code well-structured and organized?
+
+    Code:
+    {code}
+
+    Compare the code to the 5 examples given
+    Example:
+    {examples}
+
+    Based on the criterias and examples provided grade the code from 1 to 100 and give an insight.
+    Delete the **Instruction**, **Syntax**, **Correctnes**, and **Structure** only return an Insight and Grading of the code.
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a Python and Java code reviewer."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=500,
+        temperature=0.5,
+    )
+
+    return response.choices[0].message.content
 
 @method_decorator(never_cache, name='dispatch')
 class CreateActivityView(View):
@@ -105,6 +140,14 @@ class StudentGradeView(View):
 
 		return HttpResponseBadRequest("Invalid POST request")
 
+def get_activity_examples():
+	examples = []
+	example_text = ActivityExample.objects.all()
+	for example in example_text:
+		examples.append(example.example_text)
+
+	return examples
+
 class TurnInView(View):
 	def post(self, request):
 		json_data = json.loads(request.body)
@@ -126,7 +169,13 @@ class TurnInView(View):
 			activity = activity,
 			submitted_code = code,
 			submitted_at = timezone.now(),
-			feedback = feedback
 			)
 
-		return JsonResponse({"subject_id" : subject_id, "activity_id" : activity_id, "message" : "Submission Successful.", "feedback" : feedback})
+		instruction = activity.description
+
+		examples = get_activity_examples()
+
+		code = evaluate_student_code(instruction, code, examples)
+		print(code)
+
+		return JsonResponse({"subject_id" : subject_id, "activity_id" : activity_id, "message" : "Submission Successful."})

@@ -9,6 +9,7 @@ urlpatterns = [
     #
     path("create/subject/", views.CreateSubjectView.as_view(), name="create-subject"),
     #
+    path("about/", views.about, name="about"),
     path("approve/<int:user_id>/", views.ApproveUserAdminView.as_view(), name="approve"),
     path("activity/<str:activity_id>/", views.ActivityView.as_view(), name="view-activity"),
     path("settings/", views.user_settings, name="setting"),

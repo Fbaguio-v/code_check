@@ -7,14 +7,15 @@
 				<th class="px-4 py-2">Submitted Date</th>
 				<th class="px-4 py-2">Submitted Code</th>
 				<th class="px-4 py-2">Score</th>
+				<th class="px-4 py-2">Feedback</th>
 			</tr>
 		</thead>
 		<tbody class="w-full">
 			{% for submission in submissions %}
 				<tr class="h-[50px] border border-solid border-gray-300">
-					<td class="overflow-hidden"><img src="{% if submission.student.userprofile.image %}{{ submission.student.userprofile.image.url }}{% else %}/media/mysite_images/default.jpg{% endif %}"
+					<td class="px-2 py-1 w-[40px]"><img src="{% if submission.student.userprofile.image %}{{ submission.student.userprofile.image.url }}{% else %}/media/mysite_images/default.jpg{% endif %}"
                     alt="Profile Image"
-                    class="flex rounded-circle shadow-lg h-[50px] w-[50px] object-cover border-2 border-solid border-blue-500 rounded-full m-2"></td>
+                    class="h-[20px] w-[20px] object-cover border-2 border-blue-500 rounded-full shadow-md"></td>
 					<td class="px-4 py-2">{{ submission.student.email }}</td>
 					<td class="px-4 py-2">{{ submission.submitted_at }}</td>
 					<td class="px-4 py-2">{{ submission.submitted_code }}</td>
